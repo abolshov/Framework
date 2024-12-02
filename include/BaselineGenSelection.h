@@ -179,7 +179,8 @@ HBBCand GetGenHBBCandidate(int evt, const RVecI& GenPart_pdgId, const RVecVecI& 
     Hbb_cand.leg_index[1] = b_from_H.at(second);
     for(size_t leg_id = 0; leg_id < Hbb_cand.leg_p4.size(); ++leg_id) {
       const int leg_idx = Hbb_cand.leg_index[leg_id];
-      Hbb_cand.leg_p4[leg_id] = GetP4(GenPart_pt, GenPart_eta, GenPart_phi, GenPart_mass, leg_idx);
+      const double mass = ParticleDB::GetMass(GenPart_pdgId[leg_idx], GenPart_mass[leg_idx]);
+      Hbb_cand.leg_p4[leg_id] = GetP4(GenPart_pt, GenPart_eta, GenPart_phi, mass, leg_idx);
       const int match = FindMatching(Hbb_cand.leg_p4[leg_id], GenJet_p4, 0.4);
       Hbb_cand.leg_vis_p4[leg_id] = match == -1 ? LorentzVectorM{} : GenJet_p4[match];
     }

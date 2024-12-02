@@ -15,9 +15,11 @@
 using RVecF = ROOT::VecOps::RVec<float>;
 using RVecI = ROOT::VecOps::RVec<int>;
 using RVecUC = ROOT::VecOps::RVec<unsigned char>;
+using RVecShort = ROOT::VecOps::RVec<Short_t>;
+using RVecB = ROOT::VecOps::RVec<Bool_t>;
 
 namespace analysis {
-typedef std::variant<int,float,bool, unsigned long,unsigned long long,long,unsigned int, unsigned char, RVecI, RVecF,RVecUC> MultiType;
+typedef std::variant<int,float,bool, unsigned long,unsigned long long,long,unsigned int, unsigned char, RVecI, RVecF,RVecUC, RVecShort, RVecB> MultiType;
 
 struct Entry {
   std::vector<MultiType> var_values;

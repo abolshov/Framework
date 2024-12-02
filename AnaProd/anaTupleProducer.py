@@ -85,11 +85,15 @@ def createAnatuple(inFile, treeName, outDir, setup, sample_name, anaCache, snaps
     outfilesNames = []
     k=0
     for syst_name, source_name in syst_dict.items():
-        if source_name not in uncertainties and "all" not in uncertainties: continue
+        if source_name not in uncertainties and "all" not in uncertainties:
+            continue
         is_central = syst_name in [ 'Central', 'nano' ]
-        if not is_central and not compute_unc_variations: continue
+        if not is_central and not compute_unc_variations:
+            continue
         suffix = '' if is_central else f'_{syst_name}'
-        if len(suffix) and not store_noncentral: continue
+        if len(suffix) and not store_noncentral:
+            continue
+
         dfw = Utilities.DataFrameWrapper(df_empty, anaTupleDef.getDefaultColumnsToSave(isData))
 
         anaTupleDef.addAllVariables(dfw, syst_name, isData, trigger_class, lepton_legs, isSignal, setup.global_params)
@@ -107,22 +111,22 @@ def createAnatuple(inFile, treeName, outDir, setup, sample_name, anaCache, snaps
                 dfw.DefineAndAppend("weight_L1PreFiring_Muon_StatUp_rel", "L1PreFiringWeight_Muon_StatUp/L1PreFiringWeight_Muon_Nom")
                 dfw.DefineAndAppend("weight_L1PreFiring_Muon_SystDown_rel", "L1PreFiringWeight_Muon_SystDn/L1PreFiringWeight_Muon_Nom")
                 dfw.DefineAndAppend("weight_L1PreFiring_Muon_SystUp_rel", "L1PreFiringWeight_Muon_SystUp/L1PreFiringWeight_Muon_Nom")
-        if not isData:
-            weight_branches = dfw.Apply(corrections.getNormalisationCorrections, setup.global_params,
-                                        setup.samples, sample_name, lepton_legs,trigger_class.trigger_dict.keys() if trigger_class else [],
-                                        return_variations=is_central and compute_unc_variations, isCentral=is_central,
-                                        ana_cache=anaCache)
-            puIDbranches = ["weight_Jet_PUJetID_Central_tmp", "weight_Jet_PUJetID_effUp_rel_tmp", "weight_Jet_PUJetID_effDown_rel_tmp"]
-            for puIDbranch in puIDbranches:
-                if puIDbranch in dfw.df.GetColumnNames():
-                    new_branch_name= puIDbranch.strip("_tmp")
-                    dfw.Define(f"""ExtraJet_{new_branch_name}""", f"{puIDbranch}[ExtraJet_B1]")
-                    if setup.global_params["storeExtraJets"]:
-                        dfw.colToSave.append(f"""ExtraJet_{new_branch_name}""")
-                    for bjet_idx in [1,2]:
-                        dfw.DefineAndAppend(f"{new_branch_name}_b{bjet_idx}", f"Hbb_isValid ? {puIDbranch}[b{bjet_idx}_idx] : -100.f")
-                if puIDbranch in weight_branches: weight_branches.remove(puIDbranch)
-            dfw.colToSave.extend(weight_branches)
+        # if not isData:
+        #     weight_branches = dfw.Apply(corrections.getNormalisationCorrections, setup.global_params,
+        #                                 setup.samples, sample_name, lepton_legs,trigger_class.trigger_dict.keys() if trigger_class else [],
+        #                                 return_variations=is_central and compute_unc_variations, isCentral=is_central,
+        #                                 ana_cache=anaCache)
+        #     puIDbranches = ["weight_Jet_PUJetID_Central_tmp", "weight_Jet_PUJetID_effUp_rel_tmp", "weight_Jet_PUJetID_effDown_rel_tmp"]
+        #     for puIDbranch in puIDbranches:
+        #         if puIDbranch in dfw.df.GetColumnNames():
+        #             new_branch_name= puIDbranch.strip("_tmp")
+        #             dfw.Define(f"""ExtraJet_{new_branch_name}""", f"{puIDbranch}[ExtraJet_B1]")
+        #             if setup.global_params["storeExtraJets"]:
+        #                 dfw.colToSave.append(f"""ExtraJet_{new_branch_name}""")
+        #             for bjet_idx in [1,2]:
+        #                 dfw.DefineAndAppend(f"{new_branch_name}_b{bjet_idx}", f"Hbb_isValid ? {puIDbranch}[b{bjet_idx}_idx] : -100.f")
+        #         if puIDbranch in weight_branches: weight_branches.remove(puIDbranch)
+        #     dfw.colToSave.extend(weight_branches)
         varToSave = Utilities.ListToVector(dfw.colToSave)
         outfile_prefix = inFile.split('/')[-1]
         outfile_prefix = outfile_prefix.split('.')[0]
